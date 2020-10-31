@@ -1,0 +1,61 @@
+#!/bin/bash
+
+if [ ${#} -ne 2 ]; then
+    echo "argument missing" >&2
+    exit 1
+fi
+
+if [ ! -r "${2}" ]; then
+    echo "file missing" >&2
+    exit 1
+fi
+
+if [ ! -r "${1}" ]; then
+    echo "file missing" >&2
+    exit 1
+fi
+
+for i in $(cat $1); do
+    if [ ! -r $i.out ]; then
+    echo "output file missing" >&2
+    exit 1
+    fi
+
+    if [ ! -r $i.args ]; then 
+        if [ -r ${i}.in ]; then
+            $2 <${i}.in> ${i}.tmp
+        else
+            $2 > ${i}.tmp
+        fi
+    elif [ -r $i.args ]; then
+        if [ -r ${i}.in ]; then
+            $2 $(cat ${i}.args) <${i}.in> ${i}.tmp
+        else
+            if [ -e ${i}.in ]; then
+                $2 $(cat ${i}.args) ${i}.in> ${i}.tmp
+            else
+                $2 $(cat ${i}.args) >${i}.tmp
+            fi
+        fi 
+    fi
+
+    cmp $i.tmp $i.out > /dev/null
+    if [ ${?} -eq 1 ]; then 
+        echo "Test failed: ${i}"
+        echo "Args:"
+        if [ -r ${i}.args ]; then
+            cat $i.args
+        fi
+        echo "Input:"
+        if [ -r ${i}.in ]; then 
+            cat $i.in
+        fi
+        echo "Expected:"
+        cat $i.out
+        echo "Actual:"
+        cat $i.tmp
+    else
+        echo "${i} passed!"
+    fi 
+    rm $i.tmp
+done

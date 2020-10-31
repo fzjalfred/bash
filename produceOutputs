@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ ${#} -ne 2 ]; then
+    echo "argument missing" >&2
+    exit 1
+fi
+
+if [ ! -r "${2}" ]; then
+    echo "file missing" >&2
+    exit 1
+fi
+
+if [ ! -r "${1}" ]; then
+    echo "file missing" >&2
+    exit 1
+fi
+
+for i in $(cat $1)); do
+    if [ ! -r $i.args ]; then 
+        if [ -r ${i}.in ]; then
+            $2 <${i}.in> ${i}.out
+        else
+            $2 > ${i}.out
+        fi
+    elif [ -r $i.args ]; then
+        if [ -r ${i}.in ]; then
+            $2 $(cat ${i}.args) <${i}.in> ${i}.out 2>&1
+        else
+            if [ -e ${i}.in ]; then
+                $2 $(cat ${i}.args) ${i}.in> ${i}.out 2>&1
+            else
+                $2 $(cat ${i}.args) >${i}.out 2>&1
+            fi
+        fi 
+    fi
+done
