@@ -1,7 +1,6 @@
 # bash
 
-
-#produceOutput
+## produceOutput
 
 produce the output of a list of tests.
 
@@ -16,8 +15,7 @@ The results, captured from standard output, will be stored in `test2.out`.
 • The third time, it will run `./myprogram` with command line arguments provided to the program from
 `reallyBigTest.args`. The results, captured from standard output, will be stored in `reallyBigTest.out`.
 
-
-#runSuite
+## runSuite
 
 run a list of tests and give the feedback for each of case.
 
